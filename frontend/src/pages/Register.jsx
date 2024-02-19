@@ -30,11 +30,17 @@ const Register = () => {
     event.preventDefault();
     if(handleValidation()) {
       const {username, email, password} = values;
-      const {data} = await axios.post(registerRoute, {
+      let res = await axios.post(registerRoute, {
         username, 
         email, 
         password
-      })
+      });
+      res = res.data;
+      if(!res.status) {
+        toast.error(res.message, toastOptions);
+      } else {
+        toast.success(res.message, toastOptions);
+      }
     }
   };
 

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {toast} from 'react-toastify';
 import axios from 'axios';
 import 'react-toastify/dist/ReactToastify.css';
@@ -8,6 +8,7 @@ import { registerRoute } from '../utils/APIRoutes';
 
 const Register = () => {
 
+  const navigate = useNavigate();
   const [values, setValues] = useState({
     username: "",
     email: "",
@@ -16,11 +17,17 @@ const Register = () => {
   });
   const toastOptions = {
     position: "top-right",
-    autoClose: 8000,
+    autoClose: 3000,
     pauseOnHover: true,
     draggable: true,
     theme: "dark",
   };
+
+  useEffect(()=> {
+    if(localStorage.getItem('userData')) {
+      navigate('/');
+    }
+  }, []);
 
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
@@ -40,6 +47,8 @@ const Register = () => {
         toast.error(res.message, toastOptions);
       } else {
         toast.success(res.message, toastOptions);
+        localStorage.setItem('userData', JSON.stringify(res.user));
+        navigate('/');
       }
     }
   };

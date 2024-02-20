@@ -1,0 +1,1 @@
+export const AVATAR_API = 'https://api.multiavatar.com/4645646';

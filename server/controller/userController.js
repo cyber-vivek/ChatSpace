@@ -54,7 +54,14 @@ const setAvatar = async (req, res, next) => {
     }).catch(err => {
         return res.json({status: false, message: 'error updating'});
     })
+}
 
+const getAllusers = async (req, res, next) => {
+    const users = await User.find();
+    if(!users) {
+        return res.json({status: false, users: [], message: 'Could not found users'});
+    }
+    return res.json({status: true, users, message: 'Successfully fetched all users'});
 }
 
 
@@ -62,4 +69,5 @@ module.exports = {
     register,
     login,
     setAvatar,
+    getAllusers
 }

@@ -9,14 +9,17 @@ require('dotenv').config();
 app.use(cors());
 app.use(express.json());
 
+let server;
+
 mongoose.connect(process.env.MONGO_URL).then(() => {
-    console.log('db connection successfull')
+    console.log('connected to db successfully')
+    server = app.listen(process.env.PORT, () => {
+        console.log('Server Started Successfully');
+    })
 }).catch( (err) => {
     console.log('could not connect to db')
 })
 
-const server = app.listen(process.env.PORT, () => {
-    console.log('Server Started Successfully');
-})
+
 
 app.use('/api/auth',userRoutes)

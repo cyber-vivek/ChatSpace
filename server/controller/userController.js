@@ -42,8 +42,24 @@ const login = async (req, res, next) => {
     res.json({message: 'Logged in successfully', user, status: true});
 }
 
+const setAvatar = async (req, res, next) => {
+    const {image} = req.body;
+    const userDoc = await User.findOne({_id: req.params.id});
+    if(!userDoc){
+        res.json({message: 'cannot find user', status: false});
+        return;
+    }
+    User.updateOne({_id: req.params.id}, {$set: {avatarImage: image, isAvatarImageSet: true}}).then(data => {
+        return res.json({status: true, message: 'Successfully updated avatar'});
+    }).catch(err => {
+        return res.json({status: false, message: 'error updating'});
+    })
+
+}
+
 
 module.exports = {
     register,
     login,
+    setAvatar,
 }

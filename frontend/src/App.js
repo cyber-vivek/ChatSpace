@@ -4,6 +4,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Chat from './pages/Chat';
 import { ToastContainer } from 'react-toastify';
+import SetAvatar from './pages/SetAvatar';
 
 const App = () => {
   return (
@@ -12,6 +13,7 @@ const App = () => {
         <Route path='/' element={<Chat/>}/>
         <Route path='/register' element={<Register/>}/>
         <Route path='/login' element={<Login/>}/>
+        <Route path='/set-avatar' element={<SetAvatar/>}/>
       </Routes>
       <ToastContainer/>
     </Router>

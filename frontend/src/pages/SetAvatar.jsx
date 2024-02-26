@@ -7,20 +7,13 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { setAvatarRoute } from "../utils/APIRoutes";
-import { AVATAR_API } from "../utils/constants";
+import { AVATAR_API, toastOptions } from "../utils/constants";
 export default function SetAvatar() {
   const api = AVATAR_API;
   const navigate = useNavigate();
   const [avatars, setAvatars] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
-  const toastOptions = {
-    position: "top-right",
-    autoClose: 3000,
-    pauseOnHover: true,
-    draggable: true,
-    theme: "dark",
-  };
   
   const setProfilePicture = async () => {
     if (selectedAvatar === null) {
@@ -39,6 +32,10 @@ export default function SetAvatar() {
   };
 
   const getAvatarImages = async () => {
+    if(!localStorage.getItem('authToken')) {
+      navigate('/login');
+      return;
+    }
     const data = [];
     for (let i = 0; i < 4; i++) {
       const image = await axios.get(

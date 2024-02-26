@@ -5,6 +5,7 @@ import {toast} from 'react-toastify';
 import axiosHttp from '../utils/requestInterceptor'
 import 'react-toastify/dist/ReactToastify.css';
 import { loginRoute } from '../utils/APIRoutes';
+import { toastOptions } from '../utils/constants';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -12,13 +13,6 @@ const Login = () => {
       username: "",
       password: "",
     });
-    const toastOptions = {
-      position: "top-right",
-      autoClose: 3000,
-      pauseOnHover: true,
-      draggable: true,
-      theme: "dark",
-    };
   
     const handleChange = (event) => {
       setValues({ ...values, [event.target.name]: event.target.value });

@@ -5,6 +5,7 @@ import {toast} from 'react-toastify';
 import axiosHttp from '../utils/requestInterceptor';
 import 'react-toastify/dist/ReactToastify.css';
 import { registerRoute } from '../utils/APIRoutes';
+import { toastOptions } from '../utils/constants';
 
 const Register = () => {
 
@@ -15,13 +16,6 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
-  const toastOptions = {
-    position: "top-right",
-    autoClose: 3000,
-    pauseOnHover: true,
-    draggable: true,
-    theme: "dark",
-  };
 
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });

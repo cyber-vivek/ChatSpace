@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {Link, useNavigate} from 'react-router-dom';
 import {toast} from 'react-toastify';
-import axios from 'axios';
+import axiosHttp from '../utils/requestInterceptor'
 import 'react-toastify/dist/ReactToastify.css';
 import { loginRoute } from '../utils/APIRoutes';
 
@@ -20,12 +20,6 @@ const Login = () => {
       theme: "dark",
     };
   
-    useEffect(()=> {
-      if(localStorage.getItem('userData')) {
-        navigate('/');
-      }
-    }, []);
-  
     const handleChange = (event) => {
       setValues({ ...values, [event.target.name]: event.target.value });
     };
@@ -33,7 +27,7 @@ const Login = () => {
     const handleSubmit = async (event) => {
       event.preventDefault();
       const {username, password} = values;
-      let res = await axios.post(loginRoute, {
+      let res = await axiosHttp.post(loginRoute, {
         username, 
         password
       });
@@ -42,7 +36,7 @@ const Login = () => {
         toast.error(res.message, toastOptions);
       } else {
         toast.success(res.message, toastOptions);
-        localStorage.setItem('userData', JSON.stringify(res.user));
+        localStorage.setItem('authToken', JSON.stringify(res.token));
         navigate('/');
       }
     };

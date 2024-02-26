@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
+import axiosHttp from "../utils/requestInterceptor";
 import { Buffer } from "buffer";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -20,31 +21,16 @@ export default function SetAvatar() {
     draggable: true,
     theme: "dark",
   };
-
-  useEffect(() => {
-    if (!localStorage.getItem('userData'))
-      navigate("/login");
-  }, []);
-
+  
   const setProfilePicture = async () => {
     if (selectedAvatar === null) {
       toast.error("Please select an avatar", toastOptions);
     } else {
-      const user = await JSON.parse(
-        localStorage.getItem('userData')
-      );
-
-      const { data } = await axios.post(`${setAvatarRoute}/${user._id}`, {
+      const { data } = await axiosHttp.post(setAvatarRoute, {
         image: avatars[selectedAvatar],
       });
 
       if (data.status) {
-        user.isAvatarImageSet = true;
-        user.avatarImage = data.image;
-        localStorage.setItem(
-          'userData',
-          JSON.stringify(user)
-        );
         navigate("/");
       } else {
         toast.error("Error setting avatar. Please try again.", toastOptions);

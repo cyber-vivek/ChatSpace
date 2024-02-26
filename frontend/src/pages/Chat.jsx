@@ -1,40 +1,108 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { getAllUsers } from '../utils/APIRoutes';
+import React, { useEffect, useRef, useState } from 'react'
+import { redirect, useNavigate } from 'react-router-dom'
+import {io} from 'socket.io-client'
+import { getAllUsers, userDetailsRoute, host } from '../utils/APIRoutes';
 import Contacts from '../components/Contacts';
+import Welcome from '../components/Welcome';
+import ChatContainer from '../components/ChatContainer';
 import styled from 'styled-components';
+import axiosHttp from '../utils/requestInterceptor';
+import LoadingScreen from '../components/LoadingScreen';
 
 const Chat = () => {
   const [contacts, setContacts] = useState([]);
+  const [currentChat, setCurrentChat] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [arrivedMessage, setArrivedMessage] = useState(null);
+  const socket = useRef();
   const navigate = useNavigate();
-  useEffect( ()=> {
-    if(!localStorage.getItem('userData')) {
-      navigate('/login');
-    }
-    const userData = JSON.parse(localStorage.getItem('userData'));
-    if(!userData.isAvatarImageSet) {
-      navigate('/set-avatar')
-    }
-  },[]);
+  const newUserMessage = new Audio('/new-user-message.mp3');
+
   useEffect(()=> {
-    fetchAllUsers();
+    getUserDetails();
   },[]);
-  const fetchAllUsers = async () => {
-    let res = await axios.get(getAllUsers);
+
+  const getUserDetails = async () => {
+    let res = await axiosHttp.get(userDetailsRoute);
     res = res.data;
-    setContacts(res.users);
+    if(!res.userDetails.isAvatarImageSet) {
+      navigate('/set-avatar');
+      return;
+    }
+    setUserDetails(res.userDetails);
+    fetchAllUsers();
   }
-  const handleChatChange = async () => {
-    
+
+  useEffect(() => {
+    if(userDetails) {
+      setUpSocket();
+    }
+  },[userDetails])
+
+  const setUpSocket = () => {
+    socket.current = io(host);
+    if(socket.current) {
+      socket.current.emit('add-user', userDetails._id);
+      socket.current.on('message-recieve', (message) => {
+        setArrivedMessage(message);
+      })
+    }
+  }
+
+  useEffect(()=> {
+    if(!arrivedMessage) return;
+    if(currentChat && arrivedMessage.from === currentChat._id) return;
+    handleOtherContactMessages(arrivedMessage)
+  }, [arrivedMessage])
+
+  const fetchAllUsers = async () => {
+    let res = await axiosHttp.get(getAllUsers);
+    res = res.data;
+    res.users?.forEach(user => {
+      user.unreadCount = 0;
+    })
+    setContacts(res.users);
+    setIsLoading(false);
+  }
+
+  const handleOtherContactMessages = (message) => {
+    currentChat && newUserMessage.play();
+    setContacts(prevCntacts => {
+      const contacts = [...prevCntacts];
+      const index = contacts.findIndex(user => user._id === message.from);
+      if(index !== -1) {
+        const user = contacts.splice(index, 1)[0];
+        user.unreadCount += 1;
+        contacts.unshift(user);
+        return contacts;
+      }
+    })
+  }
+
+  const handleChatChange = (chat) => {
+    const users = [...contacts];
+    const index = users.findIndex(user => user._id === chat._id);
+  if(index !== -1){
+    users[index].unreadCount = 0;
+    setContacts(users);
+  }
+    setCurrentChat(chat);
   }
   return (
     <>
+    {isLoading ? <LoadingScreen/> :
       <Container>
         <div className="container">
-          <Contacts contacts={contacts} changeChat={handleChatChange} />
-        </div>
+            <Contacts contacts={contacts} changeChat={handleChatChange} userInfo={userDetails} />
+            {!currentChat ? (
+              <Welcome userInfo={userDetails} />
+            ) : (
+              <ChatContainer currentChat={currentChat} userInfo={userDetails} socket={socket} arrivedMessage={arrivedMessage}/>
+            )}
+          </div>
       </Container>
+    }
     </>
   );
 }

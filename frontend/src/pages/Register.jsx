@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {Link, useNavigate} from 'react-router-dom';
 import {toast} from 'react-toastify';
-import axios from 'axios';
+import axiosHttp from '../utils/requestInterceptor';
 import 'react-toastify/dist/ReactToastify.css';
 import { registerRoute } from '../utils/APIRoutes';
 
@@ -23,12 +23,6 @@ const Register = () => {
     theme: "dark",
   };
 
-  useEffect(()=> {
-    if(localStorage.getItem('userData')) {
-      navigate('/');
-    }
-  }, []);
-
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
   };
@@ -37,7 +31,7 @@ const Register = () => {
     event.preventDefault();
     if(handleValidation()) {
       const {username, email, password} = values;
-      let res = await axios.post(registerRoute, {
+      let res = await axiosHttp.post(registerRoute, {
         username, 
         email, 
         password
@@ -47,8 +41,8 @@ const Register = () => {
         toast.error(res.message, toastOptions);
       } else {
         toast.success(res.message, toastOptions);
-        localStorage.setItem('userData', JSON.stringify(res.user));
-        navigate('/');
+        localStorage.setItem('authToken', JSON.stringify(res.token));
+        navigate('/set-avatar');
       }
     }
   };

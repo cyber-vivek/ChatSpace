@@ -1,24 +1,15 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
-export default function Contacts({ contacts, changeChat }) {
-  const [currentUserName, setCurrentUserName] = useState(null);
-  const [currentUserImage, setCurrentUserImage] = useState(null);
+export default function Contacts({ contacts, changeChat, userInfo }) {
   const [currentSelected, setCurrentSelected] = useState(null);
-  useEffect(() => {
-    const data = JSON.parse(
-      localStorage.getItem('userData')
-    );
-    setCurrentUserName(data.username);
-    setCurrentUserImage(data.avatarImage);
-  }, []);
   const changeCurrentChat = (index, contact) => {
-    setCurrentSelected(index);
+    setCurrentSelected(contact._id);
     changeChat(contact);
   };
   return (
     <>
-      {currentUserImage && currentUserImage && (
+      {(
         <Container>
           <div className="brand">
             <img src='/logo.svg' alt="logo" />
@@ -30,7 +21,7 @@ export default function Contacts({ contacts, changeChat }) {
                 <div
                   key={contact._id}
                   className={`contact ${
-                    index === currentSelected ? "selected" : ""
+                    contact._id === currentSelected ? "selected" : ""
                   }`}
                   onClick={() => changeCurrentChat(index, contact)}
                 >
@@ -43,6 +34,10 @@ export default function Contacts({ contacts, changeChat }) {
                   <div className="username">
                     <h3>{contact.username}</h3>
                   </div>
+                  {!!contact.unreadCount &&
+                  <div className="unread-count" >{contact.unreadCount}</div>
+                  }
+
                 </div>
               );
             })}
@@ -50,12 +45,12 @@ export default function Contacts({ contacts, changeChat }) {
           <div className="current-user">
             <div className="avatar">
               <img
-                src={`data:image/svg+xml;base64,${currentUserImage}`}
+                src={`data:image/svg+xml;base64,${userInfo?.avatarImage}`}
                 alt="avatar"
               />
             </div>
             <div className="username">
-              <h2>{currentUserName}</h2>
+              <h2>{userInfo?.username}</h2>
             </div>
           </div>
         </Container>
@@ -98,6 +93,7 @@ const Container = styled.div`
     .contact {
       background-color: #ffffff34;
       min-height: 5rem;
+      position: relative;
       cursor: pointer;
       width: 90%;
       border-radius: 0.2rem;
@@ -115,6 +111,21 @@ const Container = styled.div`
         h3 {
           color: white;
         }
+      }
+      .unread-count {
+        position: absolute;
+        top: 33%;
+        right: 25px;
+        color: white;
+        font-size: 20px;
+        padding: 5px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50px;
+        background: green;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
     .selected {

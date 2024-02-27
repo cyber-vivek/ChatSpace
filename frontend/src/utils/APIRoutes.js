@@ -1,4 +1,4 @@
-export const host = "http://localhost:5000";
+export const host = "https://chat-space-kappa.vercel.app/";
 export const registerRoute = `/api/auth/register`
 export const loginRoute = `/api/auth/login`
 export const setAvatarRoute = '/api/auth/setAvatar'

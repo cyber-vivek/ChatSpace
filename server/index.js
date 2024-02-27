@@ -35,7 +35,7 @@ const setupSocket = () => {
     global.onlineUsers = new Map();
     io = new Server(server, {
         cors: {
-            origin: '*',
+            origin: false,
         }
     });
 

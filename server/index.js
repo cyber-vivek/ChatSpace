@@ -19,8 +19,8 @@ mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log('connected to db successfully')
     server = app.listen(process.env.PORT, () => {
         console.log('Server Started Successfully');
-        setupSocket();
     })
+    setupSocket();
 }).catch( (err) => {
     console.log('could not connect to db')
 })
@@ -35,9 +35,12 @@ const setupSocket = () => {
     global.onlineUsers = new Map();
     io = new Server(server, {
         cors: {
-            origin: 'https://chat-space-connect.vercel.app',
+            origin: ["http://localhost:3000", "https://chat-space-connect.vercel.app"],
             methods: ["GET", "POST"],
-        }
+            transports: ['websocket', 'polling'],
+            credentials: true
+        },
+        allowEIO3: true
     });
 
     io.on('connection', (socket) => {
